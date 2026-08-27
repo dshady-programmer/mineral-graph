@@ -24,7 +24,7 @@ I trained as a mining engineer, which is why the model draws its lines where it 
 
 This models the **network**, not the inventory.
 
-The graph records which supply routes exist and how much flows along them. It does not try to track individual batches. That is deliberate. Material is commingled and blended at every refining stage, so there is no atom level lineage to recover, and pretending otherwise would build a precision into the app that does not exist in the world. The industry accounts at flow level and the public data exists at flow level, so the model does too.
+The graph records which supply routes exist and how much flows along them. It does not try to track individual batches. That is deliberate. Material is commingled and blended at every refining stage, so there is no atom level lineage to recover. The industry accounts at flow level and the public data exists at flow level, and that's the aim of this model.
 
 Think of it like an airline route network. You model airports and routes with capacities, not individual passengers, and you can still answer everything worth asking.
 
@@ -36,9 +36,9 @@ Pick a product and the app traces every route back to a mine.
 
 ![Product composition with every route listed](docs/product-composition.png)
 
-The composition panel on the left is the answer in plain terms: this battery contains cobalt recovered as a byproduct of copper ore in Congo, cobalt from nickel laterite in Indonesia, lithium from Australian spodumene and from Chilean brine, and so on. Six lineages, thirty four routes, twenty three operations involved.
+The composition panel on the left gives the answer in simple terms: this battery contains cobalt recovered as a byproduct of copper ore in Congo, cobalt from nickel laterite in Indonesia, lithium from Australian spodumene and Chilean brine, and so on. Altogether, there are six lineages, 34 routes, and 23 operations involved.
 
-Notice cobalt appears twice. That is not a duplicate. Cobalt reaches this battery by two completely separate supply lines with different geology, different recovery processes and different political exposure. Most sources would record "cobalt" once and lose that distinction.
+Notice that cobalt appears twice. That isn’t a duplicate. Cobalt reaches this battery through two completely separate supply lines, with different geology, recovery processes, and political exposure.
 
 ### Follow a single route
 
@@ -46,7 +46,7 @@ Click a lineage and the graph highlights it. Every route is also listed undernea
 
 ![Hovering one route spotlights that chain](docs/lineage-highlight.png)
 
-That list exists because "fifteen routes" is accurate but not much use on its own. Fifteen paths run over only nine distinct links, since routes overlap heavily, so you cannot count them by eye. Grouping by origin makes the summary numbers legible: three origin groups, six plus three plus six routes, shortest chain three hops. Hovering any row spotlights that one chain in the graph so you can follow it from mine to factory.
+The list is there because saying “fifteen routes” on its own doesn’t tell you much. Those 15 routes actually run across just nine distinct links, with a lot of overlap, so the total isn’t easy to make sense of at a glance. Grouping them by origin makes the numbers clearer: three origin groups with six, three, and six routes respectively, and the shortest chain is three hops. Hovering over a row also highlights that specific chain in the graph, making it easier to follow the route from the mine to the factory.
 
 ### Then break something
 
@@ -54,23 +54,24 @@ Pick a country and see what an export restriction would cut.
 
 ![Disruption and chokepoint analysis](docs/disruption.png)
 
-The result splits into what stops completely and what only thins out, because those are very different problems. On the seeded data, a Congo restriction stops copper supply to both battery packs dead, while cobalt to the NMC pack is merely reduced, since the Indonesian line keeps running.
+The result separates what stops completely from what is only reduced, because those are two very different problems. In the seeded data, a restriction in Congo cuts off copper supply to both battery packs entirely, while cobalt supply to the NMC pack is only reduced because the Indonesian line continues to operate.
 
-The chokepoint panel ranks every intermediate facility by how many routes pass through it. Ganzhou comes out on top at 42 percent, which is the kind of thing you want to know before it becomes a headline.
+The chokepoint panel ranks each intermediate facility by the share of routes that pass through it. Ganzhou comes out on top at 42 percent, which is exactly the kind of exposure you want to know about before it becomes a headline.
 
 ## Why a graph database
 
-The honest version of this answer has two halves, because not every screen here needs a graph.
+The honest answer has two parts, because not everything on this screen needs a graph.
 
-**What a relational database could do, awkwardly.** Product composition walks from a mining operation to a factory. The number of hops varies between two and seven depending on the route, so in SQL it is a recursive CTE. It works. It is just unpleasant to read and unpleasant to change.
+**What a relational database could do, awkwardly.** Product composition follows a path from a mining operation to a factory. The number of hops varies from two to seven depending on the route, so in SQL, you would need a recursive CTE. It works, but it is difficult to read and even harder to change.
 
-**What is genuinely hard without one.** Three findings from the seeded data, none of which are stored anywhere, all of which exist only as properties of how paths overlap.
+**What is genuinely difficult without one.** Three findings from the seeded data are not stored anywhere. They emerge entirely from the way the paths overlap.
 
-*Cobalt reaches the same battery by two separate lineages.* Fifteen routes carry cobalt recovered from Congolese copper ore. Three carry cobalt from Indonesian nickel laterite. A production table records the word "cobalt" once. Only the paths tell you there are two supply lines and that one survives if the other is cut.
+*Cobalt reaches the same battery through two separate lineages.* Fifteen routes carry cobalt recovered from Congolese copper ore, while three carry cobalt from Indonesian nickel laterite. A production table can record the word “cobalt” once, but only the paths reveal that there are two distinct supply lines and that one can continue if the other is disrupted.
 
-*A Congo export restriction cuts a product that contains no cobalt.* Filter products by "requires cobalt" and you get the NMC pack. But Luilu, in Congo, is the only copper refinery reaching any plant in this graph, and the LFP pack requires copper. So the LFP pack stops dead while the NMC pack's cobalt is only thinned. Wrong product, wrong mineral, wrong severity. The right answer comes from asking which operations sit in that country and what lies downstream of them, which is a question about nodes in the middle of the chain that no product and no mine has a direct relationship with.
+*A Congo export restriction can cut a product that contains no cobalt.* If you filter products by “requires cobalt,” you get the NMC pack. But Luilu in Congo is the only copper refinery supplying any plant in this graph, and the LFP pack requires copper. So the LFP pack stops completely, while cobalt supply to the NMC pack is only reduced. Wrong product, wrong mineral, wrong severity. The right answer comes from asking which operations are in that country and what sits downstream of them—a question about intermediate nodes that neither the product nor the mine has a direct relationship with.
 
-*Every gram of cobalt passes through one refinery.* Ganzhou sits on 18 of 43 traced routes, taking from both lineages before splitting out to three of the four battery plants. Take it offline and all cobalt supply stops at once, from both sources. That fact is written nowhere. It appears only when you count how many origin to product paths run through each node, and it changes the moment anyone reroutes a shipment.
+*Every gram of cobalt passes through one refinery.* Ganzhou sits on 18 of 43 traced routes, taking material from both lineages before splitting it across three of the four battery plants. Take it offline and all cobalt supply stops at once, regardless of which source it came from. That fact is written nowhere. It emerges only when you count how many origin-to-product paths pass through each node, and it changes as soon as someone reroutes a shipment.
+
 
 ## Data model
 
@@ -102,34 +103,39 @@ graph LR
 
 ### Three decisions worth explaining
 
-**A site and an operation are different things.** Kolwezi is a place. The concentrator at Kolwezi is a process unit. Greenbushes both mines and concentrates on the same ground, so it gets two `Operation` nodes and an internal `SHIPS` edge between them. Seven of the twenty two sites work this way.
+**A site and an operation are different things.** Kolwezi is a place; the concentrator at Kolwezi is a process unit. Greenbushes both mines and concentrates on the same site, so it gets two `Operation` nodes connected by an internal `SHIPS` edge. Seven of the 22 sites work this way.
 
-This buys three things. Origins become a one word rule, since `type: 'mining'` is always the start of a chain. Chokepoint analysis gets sharper, because in a real disruption it is usually one process unit that fails rather than a whole complex. And joint ventures with different ownership per unit are expressible, since `OPERATES` hangs off the operation rather than the site.
+This gives us three useful things. First, origins become a simple rule: `type: 'mining'` always marks the start of a chain. Second, chokepoint analysis becomes more precise, because in a real disruption, it is usually a particular process unit that fails rather than an entire complex. Third, joint ventures with different ownership at different units can be represented, since `OPERATES` belongs to the operation rather than the site.
 
-**A manufacturer is a company, not a kind of node.** Glencore, CMOC and CATL are all companies. They just run different kinds of sites. Merging them means "who makes this product" is derived by traversal rather than stored, which gives you the specific plant instead of only the company name. It also makes vertical integration askable: CMOC operates a mine, a concentrator and two refineries across Congo and China, which is the concentration that actually matters in critical minerals. Under separate `Mine` and `Manufacturer` labels there was no node type spanning them, so that question had nowhere to start.
+**A manufacturer is a company, not a kind of node.** Glencore, CMOC, and CATL are all companies; they simply operate different kinds of sites. Keeping the company separate from the site means “who makes this product?” can be derived through traversal rather than stored directly, giving you the specific plant rather than just the company name.
 
-**The ore travels the whole chain, the mineral does not.** This is the idea everything else rests on.
+It also makes vertical integration something we can actually ask about. CMOC, for example, operates a mine, a concentrator, and two refineries across Congo and China. That concentration is what matters when you're looking at critical-mineral exposure. With separate `Mine` and `Manufacturer` labels, there was no common node type across those operations, so there was nowhere to start that question.
 
-When copper ore is processed, cobalt comes out. The mineral on a `SHIPS` edge changes at the concentrator. But the ore it came from never changes. So provenance is an intersection of the ore lists along every leg of a path, not a rule about which mineral transitions are allowed:
+**The ore travels through the whole chain; the mineral does not.** This is the idea everything else rests on.
+
+When copper ore is processed, cobalt can be recovered from it. The mineral represented on a `SHIPS` edge can therefore change at the concentrator, but the ore it came from does not. Provenance is consequently the intersection of the ore lists across every leg of a path, rather than a rule about which mineral transitions are allowed:
 
 ```cypher
 reduce(acc = head(relationships(path)).ores, r IN relationships(path) |
        [x IN acc WHERE x IN r.ores]) AS lineageOres
 ```
 
-That one line handles blending for free. Ganzhou takes Congolese copper ore cobalt and Indonesian nickel laterite cobalt and ships one stream onward carrying both ores. Its outbound edge accepts both traces, but the leg into it from Kolwezi carries only copper ore, so the intersection for that path is copper. The upstream legs do the discriminating and no special case is needed.
+That one line handles blending naturally. Ganzhou receives cobalt from both Congolese copper ore and Indonesian nickel laterite, then ships a combined stream onward carrying both ore traces. Its outbound edge can therefore carry both traces, while the leg from Kolwezi carries only copper ore. The intersection for that path is consequently just copper.
+
+The upstream legs do the filtering, so no special case is needed for blending.
+
 
 ## The queries
 
-Every query lives in `lib/queries.ts` as a named constant. The Cypher is never built by string concatenation and every value arrives through a parameters object.
+Every query lives in `lib/queries.ts` as a named constant. The Cypher is never built through string concatenation, and every value is passed through a parameters object.
 
-**Product composition.** Given a product, which minerals it contains and where they originated. Returns one row per `(mineral, ore)` lineage rather than per mineral, because cobalt from Congolese copper ore and cobalt from Indonesian nickel laterite are different supply lines and collapsing them would throw away the distinction the model exists to capture. The bill of materials is collected first and applied as a path predicate before the unwinds, so paths delivering nothing the product needs are cut before they multiply out into rows.
+**Product composition.** Given a product, this query finds which minerals it contains and where they originated. It returns one row for each `(mineral, ore)` lineage rather than one row per mineral. That distinction matters: cobalt from Congolese copper ore and cobalt from Indonesian nickel laterite represent two different supply lines, and collapsing them would lose exactly the distinction this model is designed to capture. The bill of materials is collected first and used as a path predicate before the results are unwound, so paths that deliver nothing the product needs are filtered out before they multiply into rows.
 
-**Route listing.** The same traversal returned as individual chains rather than aggregated, so each route can be read and highlighted on its own.
+**Route listing.** This uses the same traversal but returns the paths individually rather than aggregating them. That means each route can be read on its own and highlighted independently in the graph.
 
-**Country disruption.** Given a country, what stops. A route counts as affected if any operation on it sits in that country, not only its origin, because material merely refined there is cut too when exports stop. The result splits into severed, where every route for a mineral runs through the country, and thinned, where some survive elsewhere. A binary answer would have reported Congo as catastrophic for cobalt when it is actually partial, and missed the copper cut entirely.
+**Country disruption.** Given a country, this query determines what supply is affected. A route counts as affected if any operation along it is located in that country, not just the origin. That matters because material being refined in a country is still exposed if exports from that country stop. The result is split into *severed*, where every route for a mineral passes through the country, and *thinned*, where some routes remain available elsewhere. A simple binary answer would make Congo look catastrophic for cobalt when the actual impact is partial, while also missing the complete loss of copper supply.
 
-**Chokepoint ranking.** Which intermediate operation carries the most origin to product routes. CognoDB ships no graph algorithms library, so there is no betweenness centrality to call. This unwinds the nodes of every traced path and counts. Mining and manufacturing operations are excluded, since they always sit at the ends of their own paths and would rank meaninglessly high.
+**Chokepoint ranking.** This asks which intermediate operation carries the most origin-to-product routes. CognoDB does not provide a graph-algorithms library, so there is no betweenness centrality function to call. Instead, the query unwinds the nodes on every traced path and counts how often each intermediate operation appears. Mining and manufacturing operations are excluded because they sit at the ends of their own paths and would otherwise rank artificially high.
 
 ## What the data says
 
@@ -188,15 +194,16 @@ The seed script validates the data before it opens a connection, so a data error
 
 ## What this deliberately does not do
 
-**No batch or lot tracking.** A batch is a manufacturing time grouping, not a provenance grouping. Units from one batch can have different ancestry, and commingling destroys physical lineage anyway. Modelling it would imply a precision that does not exist.
+**No batch or lot tracking.** A batch is a manufacturing time grouping, not a provenance grouping. Units from the same batch can have different ancestry, and once materials are commingled, their physical lineage is no longer knowable. Modelling batches would therefore imply a level of precision the data does not actually support.
 
-**No tonnage weighted attribution.** The app reports how many routes reach a product, not what share of the material each carries. Doing that properly needs split ratios computed at every node, and once a `SHIPS` edge carries two ore lineages its tonnage stops being attributable to either. Route counts are the honest thing to show at this fidelity.
+**No tonnage-weighted attribution.** The app reports how many routes reach a product, not what share of the material each route carries. Doing that properly would require split ratios at every node, and once a `SHIPS` edge carries two ore lineages, the tonnage is no longer attributable cleanly to either one. At this level of fidelity, route counts are the more honest measure.
 
-**The bill of materials is a whitelist.** `REQUIRES` exists because CATL Ningde builds both NMC and LFP packs from a shared pool of incoming material, and a `SHIPS` edge points at the plant rather than at a production line inside it. Without it the LFP pack reported cobalt and nickel, which it contains none of. The weakness is that it filters after traversal, so a mineral genuinely used but missing from the list would silently vanish. The seed script refuses to run if a product has no entries at all, but it cannot catch a partial list.
+**The bill of materials is a whitelist.** `REQUIRES` exists because CATL Ningde builds both NMC and LFP packs from a shared pool of incoming material, while a `SHIPS` edge points to the plant rather than to a specific production line. Without `REQUIRES`, the LFP pack would incorrectly report cobalt and nickel, even though it contains neither. The weakness is that the filter is applied after traversal, so a mineral that is genuinely used but missing from the list would simply disappear. The seed script refuses to run when a product has no entries at all, but it cannot detect a partially incomplete list.
 
-**Ore and mineral are two levels where strictly there are three.** An ore contains minerals such as chalcopyrite, from which elements such as copper are recovered. This collapses that into ore and recovered metal. Fine for the questions being asked here, but a simplification rather than an oversight.
+**Ore and mineral are two levels where, strictly speaking, there are three.** An ore contains minerals such as chalcopyrite, from which elements such as copper are recovered. The model collapses this into ore and recovered metal. That is sufficient for the questions being asked here, but it is a simplification rather than an oversight.
 
-**No `(Product)-[:CONTAINS]->(Mineral)` shortcut.** Composition is derived by traversal every time. Storing the answer would turn the headline query into a table lookup and remove the reason for using a graph at all.
+**No `(Product)-[:CONTAINS]->(Mineral)` shortcut.** Composition is derived through traversal every time. Storing the answer would turn the main query into a table lookup and remove much of the reason for using a graph in the first place.
+
 
 ## Sources
 
