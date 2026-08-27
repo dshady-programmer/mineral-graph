@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { read, describeDbError } from '@/lib/cogno';
 import { COUNTRIES_LIST, CHOKEPOINTS } from '@/lib/queries';
 
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
 export type CountryOption = { id: string; name: string; operationCount: number };
 

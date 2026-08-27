@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { read, describeDbError } from '@/lib/cogno';
 import { PRODUCT_BY_ID, PRODUCT_COMPOSITION, PRODUCT_ROUTES, PRODUCT_PLANTS, OPERATION_DIRECTORY, ORE_AND_MINERAL_NAMES } from '@/lib/queries';
 
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
 export type Composition = {
   mineralId: string; mineral: string; symbol: string; criticality: string;

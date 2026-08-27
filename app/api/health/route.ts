@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import { read, describeDbError } from '@/lib/cogno';
 import { HEALTH, GRAPH_SUMMARY } from '@/lib/queries';
 
-// Never cache a liveness check.
-export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/health

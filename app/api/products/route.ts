@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { read, describeDbError } from '@/lib/cogno';
 import { PRODUCTS_LIST } from '@/lib/queries';
 
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
 export type ProductSummary = {
   id: string;

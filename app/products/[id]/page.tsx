@@ -269,7 +269,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                       </button>
                     </>
                   ) : (
-                    `${data.graph.nodes.length} operations · ${data.routeCount} traced routes · drag to rearrange`
+                    `${data.graph.nodes.length} operations · ${data.routeCount} traced routes · Hover on links and nodes for details`
                   )}
                 </span>
               </div>

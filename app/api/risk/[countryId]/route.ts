@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { read, describeDbError } from '@/lib/cogno';
 import { COUNTRY_DISRUPTION, COUNTRY_OPERATIONS } from '@/lib/queries';
 
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
 type DisruptionRow = {
   productId: string;
