@@ -1,69 +1,130 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { ProductSummary } from '@/app/api/products/route';
+import { LoadingState, EmptyState, ErrorState } from '@/components/States';
+
+/**
+ * One state value with a status tag, rather than separate data/error/loading
+ * flags. Two reasons: impossible combinations (data AND error) stop being
+ * representable, and nothing sets state before the first await, which would
+ * cause a cascading render.
+ */
+type View =
+  | { status: 'loading' }
+  | { status: 'ready'; products: ProductSummary[] }
+  | { status: 'error'; message: string };
 
 export default function Home() {
+  const router = useRouter();
+  const [view, setView] = useState<View>({ status: 'loading' });
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    // Guards against a slow first response landing after a newer one and
+    // overwriting it - a real race once a retry button exists.
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch('/api/products');
+        const body = await res.json();
+        if (cancelled) return;
+        if (!res.ok || body.status === 'error') {
+          setView({
+            status: 'error',
+            message: body.message ?? 'The server returned an unexpected response.',
+          });
+          return;
+        }
+        setView({ status: 'ready', products: body.products });
+      } catch {
+        // Network-level failure - the request never reached the server, so
+        // there is no server message to show.
+        if (!cancelled) {
+          setView({
+            status: 'error',
+            message: 'Could not reach the server. Check your connection and try again.',
+          });
+        }
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [reloadKey]);
+
+  const retry = () => {
+    setView({ status: 'loading' });
+    setReloadKey((k) => k + 1);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main>
+      <section className="mb-11 max-w-[44rem]">
+        <p className="mb-[.8rem] font-mono text-[.68rem] uppercase tracking-[.14em] text-teal">
+          Critical minerals · provenance by traversal
+        </p>
+        <h1 className="mb-[.85rem] text-[clamp(1.9rem,4.4vw,2.7rem)] font-bold leading-[1.08]">
+          Where the materials in a finished product actually came from.
+        </h1>
+        <p className="m-0 text-[1.03rem] text-muted">
+          Minerals move from orebody through concentration, smelting and refining before
+          they reach a factory. Choose a product to trace every route back to the mine
+          that started it — and see which country refines what it never mined.
+        </p>
+      </section>
+
+      {view.status === 'error' && <ErrorState message={view.message} onRetry={retry} />}
+
+      {view.status === 'loading' && (
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(19rem,1fr))]">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="overflow-hidden rounded-md border border-line bg-surface shadow-card">
+              <LoadingState label="Loading products" rows={4} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {view.status === 'ready' && view.products.length === 0 && (
+        <EmptyState
+          title="No products in the graph yet"
+          detail="The database is reachable but empty. Run node scripts/seed.mjs and reload."
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+      )}
+
+      {view.status === 'ready' && view.products.length > 0 && (
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(19rem,1fr))]">
+          {view.products.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              // No encodeURIComponent: ':' is legal in a URL path segment (RFC 3986
+              // pchar), and encoding it turns the readable id into
+              // prod%3Aev-battery-nmc. The ids were designed to double as clean
+              // route params, so leave them readable.
+              onClick={() => router.push(`/products/${p.id}`)}
+              className="flex cursor-pointer flex-col gap-[.7rem] rounded-md border border-line bg-surface px-[1.4rem] pt-[1.35rem] pb-[1.2rem] text-left shadow-card transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-teal hover:shadow-lift"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <span className="font-mono text-[.66rem] uppercase tracking-[.1em] text-faint">
+                {p.category}
+              </span>
+              <h2 className="text-[1.16rem] font-semibold leading-tight">{p.name}</h2>
+              <p className="m-0 flex-1 text-[.92rem] text-muted">{p.description}</p>
+              <span className="flex items-baseline justify-between gap-[.9rem] border-t border-linesoft pt-[.8rem] font-mono text-[.72rem] text-muted">
+                {/* The country list is variable length; ellipsise rather than
+                    let it wrap underneath the call to action. */}
+                <span className="min-w-0 truncate">
+                  {p.plantCount} plant{p.plantCount === 1 ? '' : 's'}
+                  {p.madeIn.length > 0 && ` · ${p.madeIn.join(', ')}`}
+                </span>
+                <span className="flex-none font-medium text-teal">Trace →</span>
+              </span>
+            </button>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+    </main>
   );
 }

@@ -1,26 +1,151 @@
-@import "tailwindcss";
+/* The font import must come FIRST. `@import 'tailwindcss'` expands to ~790
+   lines of CSS, and the spec requires every @import to precede all other
+   rules - so putting the fonts second parses fine in a production build and
+   then fails outright in dev. Order matters here. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&display=swap');
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   Deep earth. Warm-grey neutrals with a slight green bias, muted teal as the
+   primary accent, soft ochre as secondary. Ochre carries the secondary role
+   because it reads well for tonnage and volume encoding in the graph without
+   competing with the teal.
+
+   Tailwind v4's @theme turns each of these into utilities - `--color-surface`
+   generates `bg-surface`, `text-surface`, `border-surface`. Each generated
+   utility compiles to `var(--color-surface)`, which is why the dark theme
+   below works by redefining the variables rather than duplicating every rule
+   behind a `dark:` variant.
+--------------------------------------------------------------------------- */
+/* `static` matters. Tailwind v4 tree-shakes theme variables that no utility
+   class references - and the stage ramp is used only from inline `style` in the
+   SVG, so without this it is dropped from the output, nodes render black and
+   the legend dots vanish. `static` forces every variable in the block to be
+   emitted whether a utility uses it or not. */
+@theme static {
+  --font-display: 'Archivo', system-ui, sans-serif;
+  --font-sans: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-bg:          #EFEFEC;
+  --color-surface:     #FFFFFF;
+  --color-sunk:        #E5E6E1;
+  --color-raised:      #F7F7F5;
+  --color-ink:         #1A1E1C;
+  --color-inksoft:     #3C4340;
+  --color-muted:       #5E6661;
+  --color-faint:       #8A918C;
+  --color-line:        #D3D5CE;
+  --color-linesoft:    #E2E3DE;
+
+  --color-teal:        #3F8C85;
+  --color-tealdeep:    #2F6B66;
+  --color-tealwash:    #E4EFED;
+  --color-ochre:       #A87F45;
+  --color-ochrewash:   #F2EADD;
+  --color-danger:      #A5533F;
+  --color-dangerwash:  #F5E5E1;
+
+  /* Sequential ramp for the five process stages. The stages are ordered, so
+     this is a ramp rather than five arbitrary hues. */
+  --color-stage-0: #2F6B66;
+  --color-stage-1: #4A8B7E;
+  --color-stage-2: #7BA277;
+  --color-stage-3: #A8A063;
+  --color-stage-4: #A87F45;
+
+  --shadow-card: 0 1px 2px rgba(26,30,28,.05);
+  --shadow-lift: 0 1px 3px rgba(26,30,28,.06), 0 6px 18px rgba(26,30,28,.05);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* Redefining the same variables is the entire dark theme, because every
+   generated utility already points at them. No `dark:` prefixes anywhere. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-bg:          #16191A;
+    --color-surface:     #1E2223;
+    --color-sunk:        #262B2B;
+    --color-raised:      #232829;
+    --color-ink:         #E6E9E5;
+    --color-inksoft:     #C3C9C4;
+    --color-muted:       #8E9691;
+    --color-faint:       #6B736E;
+    --color-line:        #2E3433;
+    --color-linesoft:    #262B2B;
+
+    --color-teal:        #5FB3AA;
+    --color-tealdeep:    #7FC7BF;
+    --color-tealwash:    #1B2A29;
+    --color-ochre:       #C9A46A;
+    --color-ochrewash:   #2A2418;
+    --color-danger:      #D07E68;
+    --color-dangerwash:  #2C1C18;
+
+    --color-stage-0: #4E9E95;
+    --color-stage-1: #6BB39F;
+    --color-stage-2: #94BE86;
+    --color-stage-3: #C2B673;
+    --color-stage-4: #C9A46A;
+
+    --shadow-card: 0 1px 2px rgba(0,0,0,.35);
+    --shadow-lift: 0 1px 3px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.3);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------------------------------------------------------------------------
+   Base layer: document defaults only. Everything else is utilities in the JSX.
+--------------------------------------------------------------------------- */
+@layer base {
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-teal);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      transition-duration: .001ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* A moving gradient sweep is not expressible as utilities, so it stays a
+     class. Everything else in the app is utility-driven. */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-sunk) 25%,
+      var(--color-linesoft) 50%,
+      var(--color-sunk) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+    border-radius: 4px;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
 }

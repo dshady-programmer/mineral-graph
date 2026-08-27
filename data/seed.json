@@ -1,0 +1,187 @@
+{
+  "_model": "Seven labels: Country, Company, Site, Operation, Ore, Mineral, Product. A Site is a place; an Operation is one process unit at that place, so a site that mines AND concentrates has two Operation nodes. SHIPS runs Operation -> Operation and carries ores[], minerals[], form[] as lists. `ores` is invariant along a lineage, which is what makes the path guard a single IN test.",
+  "_sources": "Country production totals: USGS Mineral Commodity Summaries 2026, 2025 estimated column. Operation-level tonnages are plausible allocations, not USGS - verify against company reports before submitting.",
+
+  "countries": [
+    { "id": "ctry:cd", "name": "DR Congo", "usgs_name": "Congo (Kinshasa)", "region": "Africa" },
+    { "id": "ctry:au", "name": "Australia", "region": "Oceania" },
+    { "id": "ctry:cl", "name": "Chile", "region": "South America" },
+    { "id": "ctry:id", "name": "Indonesia", "region": "Asia" },
+    { "id": "ctry:cn", "name": "China", "region": "Asia" },
+    { "id": "ctry:us", "name": "United States", "region": "North America" },
+    { "id": "ctry:kr", "name": "South Korea", "usgs_name": "Korea, Republic of", "region": "Asia" },
+    { "id": "ctry:jp", "name": "Japan", "region": "Asia" },
+    { "id": "ctry:fi", "name": "Finland", "region": "Europe" },
+    { "id": "ctry:de", "name": "Germany", "region": "Europe" },
+    { "id": "ctry:ch", "name": "Switzerland", "region": "Europe" },
+    { "id": "ctry:br", "name": "Brazil", "region": "South America" },
+    { "id": "ctry:dk", "name": "Denmark", "region": "Europe" }
+  ],
+
+  "ores": [
+    { "id": "ore:copper",          "name": "Copper ore",         "description": "Sediment-hosted copper-cobalt ore of the Central African Copperbelt" },
+    { "id": "ore:nickel-laterite", "name": "Nickel laterite",    "description": "Weathered ultramafic laterite, nickel with cobalt in the limonite zone" },
+    { "id": "ore:spodumene",       "name": "Spodumene pegmatite","description": "Hard-rock lithium aluminium silicate" },
+    { "id": "ore:lithium-brine",   "name": "Lithium brine",      "description": "Continental salar brine" },
+    { "id": "ore:bastnaesite",     "name": "Bastnasite",         "description": "Rare earth fluorocarbonate, light rare earth bearing" }
+  ],
+
+  "minerals": [
+    { "id": "mnrl:cu", "name": "Copper",     "symbol": "Cu", "criticality": "medium" },
+    { "id": "mnrl:co", "name": "Cobalt",     "symbol": "Co", "criticality": "high" },
+    { "id": "mnrl:ni", "name": "Nickel",     "symbol": "Ni", "criticality": "high" },
+    { "id": "mnrl:li", "name": "Lithium",    "symbol": "Li", "criticality": "high" },
+    { "id": "mnrl:nd", "name": "Neodymium",  "symbol": "Nd", "criticality": "high" }
+  ],
+
+  "_occurs_in_note": "The hard-coded knowledge base. Answers 'what can be recovered from copper ore' in one traversal - copper as primary, cobalt as byproduct. Cobalt appears against two ores because it is genuinely recovered from both, and those are different lineages with different geology and different risk.",
+  "occurs_in": [
+    { "mineral": "mnrl:cu", "ore": "ore:copper",          "role": "primary" },
+    { "mineral": "mnrl:co", "ore": "ore:copper",          "role": "byproduct" },
+    { "mineral": "mnrl:ni", "ore": "ore:nickel-laterite", "role": "primary" },
+    { "mineral": "mnrl:co", "ore": "ore:nickel-laterite", "role": "byproduct" },
+    { "mineral": "mnrl:li", "ore": "ore:spodumene",       "role": "primary" },
+    { "mineral": "mnrl:li", "ore": "ore:lithium-brine",   "role": "primary" },
+    { "mineral": "mnrl:nd", "ore": "ore:bastnaesite",     "role": "primary" }
+  ],
+
+  "companies": [
+    { "id": "co:glencore",     "name": "Glencore",                  "hq_country": "ctry:ch" },
+    { "id": "co:cmoc",         "name": "CMOC Group",                "hq_country": "ctry:cn" },
+    { "id": "co:talison",      "name": "Talison Lithium",           "hq_country": "ctry:au" },
+    { "id": "co:pilbara",      "name": "Pilbara Minerals",          "hq_country": "ctry:au" },
+    { "id": "co:sqm",          "name": "SQM",                       "hq_country": "ctry:cl" },
+    { "id": "co:vale",         "name": "Vale",                      "hq_country": "ctry:br" },
+    { "id": "co:tsingshan",    "name": "Tsingshan Holding Group",   "hq_country": "ctry:cn" },
+    { "id": "co:mp-materials", "name": "MP Materials",              "hq_country": "ctry:us" },
+    { "id": "co:cnre",         "name": "China Northern Rare Earth", "hq_country": "ctry:cn" },
+    { "id": "co:catl",         "name": "CATL",                      "hq_country": "ctry:cn" },
+    { "id": "co:lges",         "name": "LG Energy Solution",        "hq_country": "ctry:kr" },
+    { "id": "co:panasonic",    "name": "Panasonic Energy",          "hq_country": "ctry:jp" },
+    { "id": "co:vestas",       "name": "Vestas",                    "hq_country": "ctry:dk" }
+  ],
+
+  "sites": [
+    { "id": "site:kamoto",          "name": "Kamoto",                     "country": "ctry:cd" },
+    { "id": "site:mutanda",         "name": "Mutanda",                    "country": "ctry:cd" },
+    { "id": "site:tenke",           "name": "Tenke Fungurume",            "country": "ctry:cd" },
+    { "id": "site:kolwezi",         "name": "Kolwezi",                    "country": "ctry:cd" },
+    { "id": "site:luilu",           "name": "Luilu",                      "country": "ctry:cd" },
+    { "id": "site:greenbushes",     "name": "Greenbushes",                "country": "ctry:au" },
+    { "id": "site:pilgangoora",     "name": "Pilgangoora",                "country": "ctry:au" },
+    { "id": "site:kwinana",         "name": "Kwinana",                    "country": "ctry:au" },
+    { "id": "site:atacama",         "name": "Salar de Atacama",           "country": "ctry:cl" },
+    { "id": "site:sorowako",        "name": "Sorowako",                   "country": "ctry:id" },
+    { "id": "site:morowali",        "name": "Morowali",                   "country": "ctry:id" },
+    { "id": "site:ganzhou",         "name": "Ganzhou",                    "country": "ctry:cn" },
+    { "id": "site:sichuan",         "name": "Sichuan",                    "country": "ctry:cn" },
+    { "id": "site:bayan-obo",       "name": "Bayan Obo",                  "country": "ctry:cn" },
+    { "id": "site:baotou",          "name": "Baotou",                     "country": "ctry:cn" },
+    { "id": "site:harjavalta",      "name": "Harjavalta",                 "country": "ctry:fi" },
+    { "id": "site:mountain-pass",   "name": "Mountain Pass",              "country": "ctry:us" },
+    { "id": "site:catl-ningde",     "name": "CATL Ningde",                "country": "ctry:cn" },
+    { "id": "site:catl-erfurt",     "name": "CATL Erfurt",                "country": "ctry:de" },
+    { "id": "site:lges-ochang",     "name": "LGES Ochang",  "country": "ctry:kr" },
+    { "id": "site:panasonic-kansai","name": "Panasonic Kansai",           "country": "ctry:jp" },
+    { "id": "site:vestas-tianjin",  "name": "Vestas Tianjin",             "country": "ctry:cn" }
+  ],
+
+  "_operations_note": "Sites doing more than one thing get one Operation each: Greenbushes and Pilgangoora mine and concentrate on site, Morowali mines and smelts, Mountain Pass mines and refines. All real. The split makes 'type: mining is always an origin' a one-word rule, and lets a chokepoint be a single process unit rather than a whole complex.",
+  "operations": [
+    { "id": "op:kamoto-mining",          "site": "site:kamoto",          "type": "mining",         "operator": "co:glencore",     "capacity": 30000,  "status": "operating" },
+    { "id": "op:mutanda-mining",         "site": "site:mutanda",         "type": "mining",         "operator": "co:glencore",     "capacity": 25000,  "status": "operating" },
+    { "id": "op:tenke-mining",           "site": "site:tenke",           "type": "mining",         "operator": "co:cmoc",         "capacity": 40000,  "status": "operating" },
+    { "id": "op:kolwezi-concentration",  "site": "site:kolwezi",         "type": "concentration",  "operator": "co:cmoc",         "capacity": 90000,  "status": "operating" },
+    { "id": "op:luilu-refining",         "site": "site:luilu",           "type": "refining",       "operator": "co:glencore",     "capacity": 85000,  "status": "operating" },
+
+    { "id": "op:greenbushes-mining",         "site": "site:greenbushes", "type": "mining",        "operator": "co:talison", "capacity": 120000, "status": "operating" },
+    { "id": "op:greenbushes-concentration",  "site": "site:greenbushes", "type": "concentration", "operator": "co:talison", "capacity": 45000,  "status": "operating" },
+    { "id": "op:pilgangoora-mining",         "site": "site:pilgangoora", "type": "mining",        "operator": "co:pilbara", "capacity": 90000,  "status": "operating" },
+    { "id": "op:pilgangoora-concentration",  "site": "site:pilgangoora", "type": "concentration", "operator": "co:pilbara", "capacity": 22000,  "status": "operating" },
+    { "id": "op:kwinana-refining",           "site": "site:kwinana",     "type": "refining",      "operator": "co:talison", "capacity": 24000,  "status": "operating" },
+    { "id": "op:atacama-mining",             "site": "site:atacama",     "type": "mining",        "operator": "co:sqm",     "capacity": 500000, "status": "operating" },
+    { "id": "op:atacama-concentration",      "site": "site:atacama",     "type": "concentration", "operator": "co:sqm",     "capacity": 56000,  "status": "operating" },
+
+    { "id": "op:sorowako-mining",   "site": "site:sorowako", "type": "mining",   "operator": "co:vale",      "capacity": 250000, "status": "operating" },
+    { "id": "op:sorowako-smelting", "site": "site:sorowako", "type": "smelting", "operator": "co:vale",      "capacity": 70000,  "status": "operating" },
+    { "id": "op:morowali-mining",   "site": "site:morowali", "type": "mining",   "operator": "co:tsingshan", "capacity": 400000, "status": "operating" },
+    { "id": "op:morowali-smelting", "site": "site:morowali", "type": "smelting", "operator": "co:tsingshan", "capacity": 350000, "status": "operating" },
+
+    { "id": "op:ganzhou-refining",   "site": "site:ganzhou",   "type": "refining", "operator": "co:cmoc",     "capacity": 120000, "status": "operating" },
+    { "id": "op:sichuan-refining",   "site": "site:sichuan",   "type": "refining", "operator": "co:cmoc",     "capacity": 80000,  "status": "operating" },
+    { "id": "op:harjavalta-refining","site": "site:harjavalta","type": "refining", "operator": "co:glencore", "capacity": 65000,  "status": "operating" },
+
+    { "id": "op:bayan-obo-mining",             "site": "site:bayan-obo",     "type": "mining",        "operator": "co:cnre",         "capacity": 400000, "status": "operating" },
+    { "id": "op:bayan-obo-concentration",      "site": "site:bayan-obo",     "type": "concentration", "operator": "co:cnre",         "capacity": 150000, "status": "operating" },
+    { "id": "op:baotou-refining",              "site": "site:baotou",        "type": "refining",      "operator": "co:cnre",         "capacity": 200000, "status": "operating" },
+    { "id": "op:mountain-pass-mining",         "site": "site:mountain-pass", "type": "mining",        "operator": "co:mp-materials", "capacity": 200000, "status": "operating" },
+    { "id": "op:mountain-pass-concentration",  "site": "site:mountain-pass", "type": "concentration", "operator": "co:mp-materials", "capacity": 85000,  "status": "operating" },
+    { "id": "op:mountain-pass-refining",       "site": "site:mountain-pass", "type": "refining",      "operator": "co:mp-materials", "capacity": 42000,  "status": "operating" },
+
+    { "id": "op:catl-ningde-manufacturing",      "site": "site:catl-ningde",      "type": "manufacturing", "operator": "co:catl",      "capacity": 120000, "status": "operating", "makes": ["prod:ev-battery-nmc", "prod:ev-battery-lfp"] },
+    { "id": "op:catl-erfurt-manufacturing",      "site": "site:catl-erfurt",      "type": "manufacturing", "operator": "co:catl",      "capacity": 14000,  "status": "operating", "makes": ["prod:ev-battery-nmc"] },
+    { "id": "op:lges-ochang-manufacturing",      "site": "site:lges-ochang",      "type": "manufacturing", "operator": "co:lges",      "capacity": 45000,  "status": "operating", "makes": ["prod:ev-battery-nmc"] },
+    { "id": "op:panasonic-kansai-manufacturing", "site": "site:panasonic-kansai", "type": "manufacturing", "operator": "co:panasonic", "capacity": 20000,  "status": "operating", "makes": ["prod:ev-battery-nmc"] },
+    { "id": "op:vestas-tianjin-manufacturing",   "site": "site:vestas-tianjin",   "type": "manufacturing", "operator": "co:vestas",    "capacity": 26000,  "status": "operating", "makes": ["prod:wind-generator"] }
+  ],
+
+  "products": [
+    { "id": "prod:ev-battery-nmc",  "name": "EV Battery Pack (NMC)", "category": "Energy storage", "description": "Nickel-manganese-cobalt lithium-ion pack for passenger electric vehicles." },
+    { "id": "prod:ev-battery-lfp",  "name": "EV Battery Pack (LFP)", "category": "Energy storage", "description": "Lithium-iron-phosphate pack. No cobalt or nickel in the cathode - the contrast with NMC is the point." },
+    { "id": "prod:wind-generator",  "name": "Wind Turbine Generator","category": "Power generation","description": "Direct-drive permanent-magnet generator using neodymium-iron-boron magnets." }
+  ],
+
+  "_requires_note": "Bill of materials, hard coded like occurs_in. Needed because a plant can build more than one product line from different input streams: CATL Ningde makes both NMC and LFP, and without this every mineral reaching the plant is attributed to both. LFP is lithium-iron-phosphate - no cobalt, no nickel - so the contrast only reads correctly with this edge in place.",
+  "requires": [
+    { "product": "prod:ev-battery-nmc", "mineral": "mnrl:li" },
+    { "product": "prod:ev-battery-nmc", "mineral": "mnrl:ni" },
+    { "product": "prod:ev-battery-nmc", "mineral": "mnrl:co" },
+    { "product": "prod:ev-battery-nmc", "mineral": "mnrl:cu" },
+    { "product": "prod:ev-battery-lfp", "mineral": "mnrl:li" },
+    { "product": "prod:ev-battery-lfp", "mineral": "mnrl:cu" },
+    { "product": "prod:wind-generator",  "mineral": "mnrl:nd" },
+    { "product": "prod:wind-generator",  "mineral": "mnrl:cu" }
+  ],
+
+  "ships": [
+    { "from": "op:kamoto-mining",             "to": "op:kolwezi-concentration",       "ores": ["ore:copper"],          "minerals": [],           "form": ["ore"],         "tonnage": 45000 },
+    { "from": "op:tenke-mining",              "to": "op:kolwezi-concentration",       "ores": ["ore:copper"],          "minerals": [],           "form": ["ore"],         "tonnage": 40000 },
+    { "from": "op:mutanda-mining",            "to": "op:luilu-refining",              "ores": ["ore:copper"],          "minerals": [],           "form": ["ore"],         "tonnage": 25000 },
+    { "from": "op:kolwezi-concentration",     "to": "op:luilu-refining",              "ores": ["ore:copper"],          "minerals": ["mnrl:co","mnrl:cu"], "form": ["concentrate"], "tonnage": 60000 },
+    { "from": "op:kolwezi-concentration",     "to": "op:ganzhou-refining",            "ores": ["ore:copper"],          "minerals": ["mnrl:co"],  "form": ["hydroxide"],   "tonnage": 20000 },
+    { "from": "op:luilu-refining",            "to": "op:ganzhou-refining",            "ores": ["ore:copper"],          "minerals": ["mnrl:co"],  "form": ["hydroxide"],   "tonnage": 46000 },
+    { "from": "op:luilu-refining",            "to": "op:catl-ningde-manufacturing",   "ores": ["ore:copper"],          "minerals": ["mnrl:cu"],  "form": ["cathode"],     "tonnage": 30000 },
+
+    { "from": "op:sorowako-mining",           "to": "op:sorowako-smelting",           "ores": ["ore:nickel-laterite"], "minerals": [],           "form": ["ore"],         "tonnage": 250000 },
+    { "from": "op:sorowako-smelting",         "to": "op:harjavalta-refining",         "ores": ["ore:nickel-laterite"], "minerals": ["mnrl:ni"],  "form": ["matte"],       "tonnage": 65000 },
+    { "from": "op:morowali-mining",           "to": "op:morowali-smelting",           "ores": ["ore:nickel-laterite"], "minerals": [],           "form": ["ore"],         "tonnage": 400000 },
+    { "from": "op:morowali-smelting",         "to": "op:ganzhou-refining",            "ores": ["ore:nickel-laterite"], "minerals": ["mnrl:co"],  "form": ["mhp"],         "tonnage": 36000 },
+    { "from": "op:morowali-smelting",         "to": "op:catl-ningde-manufacturing",   "ores": ["ore:nickel-laterite"], "minerals": ["mnrl:ni"],  "form": ["sulphate"],    "tonnage": 300000 },
+    { "from": "op:harjavalta-refining",       "to": "op:lges-ochang-manufacturing",   "ores": ["ore:nickel-laterite"], "minerals": ["mnrl:ni"],  "form": ["sulphate"],    "tonnage": 60000 },
+    { "from": "op:harjavalta-refining",       "to": "op:panasonic-kansai-manufacturing","ores": ["ore:nickel-laterite"],"minerals": ["mnrl:ni"], "form": ["sulphate"],    "tonnage": 5000 },
+
+    { "from": "op:ganzhou-refining",          "to": "op:catl-ningde-manufacturing",   "ores": ["ore:copper","ore:nickel-laterite"], "minerals": ["mnrl:co"], "form": ["sulphate"], "tonnage": 78000 },
+    { "from": "op:ganzhou-refining",          "to": "op:catl-erfurt-manufacturing",   "ores": ["ore:copper","ore:nickel-laterite"], "minerals": ["mnrl:co"], "form": ["sulphate"], "tonnage": 12000 },
+    { "from": "op:ganzhou-refining",          "to": "op:lges-ochang-manufacturing",   "ores": ["ore:copper","ore:nickel-laterite"], "minerals": ["mnrl:co"], "form": ["sulphate"], "tonnage": 22000 },
+
+    { "from": "op:greenbushes-mining",        "to": "op:greenbushes-concentration",   "ores": ["ore:spodumene"],       "minerals": [],           "form": ["ore"],         "tonnage": 120000 },
+    { "from": "op:greenbushes-concentration", "to": "op:kwinana-refining",            "ores": ["ore:spodumene"],       "minerals": ["mnrl:li"],  "form": ["concentrate"], "tonnage": 16000 },
+    { "from": "op:greenbushes-concentration", "to": "op:sichuan-refining",            "ores": ["ore:spodumene"],       "minerals": ["mnrl:li"],  "form": ["concentrate"], "tonnage": 24000 },
+    { "from": "op:pilgangoora-mining",        "to": "op:pilgangoora-concentration",   "ores": ["ore:spodumene"],       "minerals": [],           "form": ["ore"],         "tonnage": 90000 },
+    { "from": "op:pilgangoora-concentration", "to": "op:sichuan-refining",            "ores": ["ore:spodumene"],       "minerals": ["mnrl:li"],  "form": ["concentrate"], "tonnage": 20000 },
+    { "from": "op:atacama-mining",            "to": "op:atacama-concentration",       "ores": ["ore:lithium-brine"],   "minerals": [],           "form": ["brine"],       "tonnage": 500000 },
+    { "from": "op:atacama-concentration",     "to": "op:sichuan-refining",            "ores": ["ore:lithium-brine"],   "minerals": ["mnrl:li"],  "form": ["carbonate"],   "tonnage": 30000 },
+    { "from": "op:kwinana-refining",          "to": "op:lges-ochang-manufacturing",   "ores": ["ore:spodumene"],       "minerals": ["mnrl:li"],  "form": ["hydroxide"],   "tonnage": 15000 },
+    { "from": "op:sichuan-refining",          "to": "op:catl-ningde-manufacturing",   "ores": ["ore:lithium-brine","ore:spodumene"], "minerals": ["mnrl:li"], "form": ["hydroxide"], "tonnage": 52000 },
+    { "from": "op:sichuan-refining",          "to": "op:catl-erfurt-manufacturing",   "ores": ["ore:lithium-brine","ore:spodumene"], "minerals": ["mnrl:li"], "form": ["hydroxide"], "tonnage": 8000 },
+    { "from": "op:sichuan-refining",          "to": "op:panasonic-kansai-manufacturing","ores": ["ore:lithium-brine","ore:spodumene"], "minerals": ["mnrl:li"], "form": ["hydroxide"], "tonnage": 12000 },
+
+    { "from": "op:bayan-obo-mining",             "to": "op:bayan-obo-concentration",     "ores": ["ore:bastnaesite"],     "minerals": [],           "form": ["ore"],         "tonnage": 400000 },
+    { "from": "op:bayan-obo-concentration",      "to": "op:baotou-refining",             "ores": ["ore:bastnaesite"],     "minerals": ["mnrl:nd"],  "form": ["concentrate"], "tonnage": 150000 },
+    { "from": "op:mountain-pass-mining",         "to": "op:mountain-pass-concentration",  "ores": ["ore:bastnaesite"],     "minerals": [],           "form": ["ore"],         "tonnage": 200000 },
+    { "from": "op:mountain-pass-concentration",  "to": "op:baotou-refining",             "ores": ["ore:bastnaesite"],     "minerals": ["mnrl:nd"],  "form": ["concentrate"], "tonnage": 38000 },
+    { "from": "op:mountain-pass-concentration",  "to": "op:mountain-pass-refining",      "ores": ["ore:bastnaesite"],     "minerals": ["mnrl:nd"],  "form": ["concentrate"], "tonnage": 45000 },
+    { "from": "op:baotou-refining",           "to": "op:vestas-tianjin-manufacturing","ores": ["ore:bastnaesite"],     "minerals": ["mnrl:nd"],  "form": ["oxide"],       "tonnage": 24000 },
+    { "from": "op:mountain-pass-refining",    "to": "op:vestas-tianjin-manufacturing","ores": ["ore:bastnaesite"],     "minerals": ["mnrl:nd"],  "form": ["oxide"],       "tonnage": 1500 }
+  ]
+}
