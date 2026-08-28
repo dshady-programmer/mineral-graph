@@ -1,7 +1,10 @@
 # Mineral Supply Chain Network
 
-![Video Demo](docs/mineral-graph-demo.mp4)
 
+
+<video src="docs/mineral-graph-demo.mp4" width="600" controls>
+  Video Demo
+</video>
 Trace the critical minerals in a finished product back to the orebody they came from, and work out what stops when one link in the chain fails.
 
 Built on CognoDB, a managed graph database that speaks openCypher over Bolt.

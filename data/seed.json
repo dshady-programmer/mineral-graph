@@ -81,7 +81,7 @@
     { "id": "site:mountain-pass",   "name": "Mountain Pass",              "country": "ctry:us" },
     { "id": "site:catl-ningde",     "name": "CATL Ningde",                "country": "ctry:cn" },
     { "id": "site:catl-erfurt",     "name": "CATL Erfurt",                "country": "ctry:de" },
-    { "id": "site:lges-ochang",     "name": "LGES Ochang",  "country": "ctry:kr" },
+    { "id": "site:lges-ochang",     "name": "LGES Ochang",                "country": "ctry:kr" },
     { "id": "site:panasonic-kansai","name": "Panasonic Kansai",           "country": "ctry:jp" },
     { "id": "site:vestas-tianjin",  "name": "Vestas Tianjin",             "country": "ctry:cn" }
   ],
