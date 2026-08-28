@@ -2,9 +2,9 @@
 
 
 
-<video src="docs/mineral-graph-demo.mp4" width="600" controls>
-  Video Demo
-</video>
+
+https://github.com/user-attachments/assets/a0ff4253-4cc0-420c-bf1c-b391c50d4222
+
 Trace the critical minerals in a finished product back to the orebody they came from, and work out what stops when one link in the chain fails.
 
 Built on CognoDB, a managed graph database that speaks openCypher over Bolt.
